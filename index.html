@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kuis Bleach</title>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', Arial, sans-serif;
+      background: linear-gradient(to top, #3b1d5e, #1a1040 45%, #050510);
+      color: #f5f5f5;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .box {
+      background: rgba(10, 10, 20, 0.85);
+      border-left: 8px solid #ff6a00;
+      max-width: 560px;
+      width: 100%;
+      padding: 30px 26px;
+    }
+    h1 {
+      font-family: 'Anton', Impact, sans-serif;
+      font-size: 36px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    h1 span { color: #ff6a00; }
+    .info { font-size: 13px; letter-spacing: 2px; opacity: 0.7; margin-bottom: 20px; }
+    .soal { font-size: 19px; line-height: 1.5; margin-bottom: 18px; }
+    .opsi {
+      display: block;
+      width: 100%;
+      text-align: left;
+      font-family: inherit;
+      font-size: 16px;
+      color: #f5f5f5;
+      background: rgba(255,255,255,0.08);
+      border: 2px solid #f5f5f5;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .opsi:hover:not(:disabled) { background: #f5f5f5; color: #000; }
+    .opsi.benar { background: #1fa855; border-color: #1fa855; color: #fff; }
+    .opsi.salah { background: #d90429; border-color: #d90429; color: #fff; }
+    .opsi:disabled { cursor: default; }
+    .btn {
+      font-family: 'Anton', Impact, sans-serif;
+      font-size: 18px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      background: #ff6a00;
+      color: #000;
+      border: none;
+      padding: 12px 28px;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    .btn:hover { background: #fff; }
+    .hasil { text-align: center; }
+    .skor { font-family: 'Anton', Impact, sans-serif; font-size: 80px; color: #ff6a00; }
+    .pangkat { font-size: 18px; margin: 10px 0 20px; line-height: 1.5; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>Kuis <span>Bleach</span></h1>
+    <div id="kuis">
+      <p class="info" id="info"></p>
+      <p class="soal" id="soal"></p>
+      <div id="opsi"></div>
+      <button class="btn hidden" id="lanjut">Lanjut</button>
+    </div>
+    <div id="hasil" class="hasil hidden">
+      <p class="skor" id="skor"></p>
+      <p class="pangkat" id="pangkat"></p>
+      <button class="btn" id="ulang">Main Lagi</button>
+    </div>
+  </div>
+
+  <script>
+    const data = [
+      { q: "Apa nama zanpakuto Ichigo Kurosaki?", o: ["Zangetsu", "Hyorinmaru", "Senbonzakura", "Benihime"], a: 0 },
+      { q: "Siapa Shinigami yang memberikan kekuatannya kepada Ichigo?", o: ["Orihime Inoue", "Rukia Kuchiki", "Rangiku Matsumoto", "Yoruichi Shihoin"], a: 1 },
+      { q: "Siapa kapten Divisi 6 di Gotei 13?", o: ["Toshiro Hitsugaya", "Kenpachi Zaraki", "Byakuya Kuchiki", "Sosuke Aizen"], a: 2 },
+      { q: "Apa nama zanpakuto milik Toshiro Hitsugaya?", o: ["Ryujin Jakka", "Hyorinmaru", "Zabimaru", "Katen Kyokotsu"], a: 1 },
+      { q: "Apa nama dunia tempat para Shinigami tinggal?", o: ["Hueco Mundo", "Karakura", "Soul Society", "Las Noches"], a: 2 },
+      { q: "Apa nama bankai milik Ichigo?", o: ["Tensa Zangetsu", "Daiguren Hyorinmaru", "Kokujo Tengen Myo-o", "Senbonzakura Kageyoshi"], a: 0 }
+    ];
+
+    let i = 0, skor = 0;
+    const $ = id => document.getElementById(id);
+
+    function tampil() {
+      const d = data[i];
+      $("info").textContent = "SOAL " + (i + 1) + " / " + data.length + "  ·  SKOR " + skor;
+      $("soal").textContent = d.q;
+      $("opsi").innerHTML = "";
+      $("lanjut").classList.add("hidden");
+      d.o.forEach((teks, idx) => {
+        const b = document.createElement("button");
+        b.className = "opsi";
+        b.textContent = teks;
+        b.onclick = () => jawab(idx);
+        $("opsi").appendChild(b);
+      });
+    }
+
+    function jawab(idx) {
+      const d = data[i];
+      const semua = document.querySelectorAll(".opsi");
+      semua.forEach((b, n) => {
+        b.disabled = true;
+        if (n === d.a) b.classList.add("benar");
+      });
+      if (idx === d.a) skor++;
+      else semua[idx].classList.add("salah");
+      $("info").textContent = "SOAL " + (i + 1) + " / " + data.length + "  ·  SKOR " + skor;
+      $("lanjut").textContent = (i === data.length - 1) ? "Lihat Hasil" : "Lanjut";
+      $("lanjut").classList.remove("hidden");
+    }
+
+    $("lanjut").onclick = () => {
+      i++;
+      if (i < data.length) tampil();
+      else selesai();
+    };
+
+    function selesai() {
+      $("kuis").classList.add("hidden");
+      $("hasil").classList.remove("hidden");
+      $("skor").textContent = skor + " / " + data.length;
+      let p;
+      if (skor === data.length) p = "Level Kapten Jenderal! Kamu fans sejati Bleach.";
+      else if (skor >= 4) p = "Level Kapten! Pengetahuanmu sudah mantap.";
+      else if (skor >= 2) p = "Level Letnan. Tonton ulang anime-nya, ya!";
+      else p = "Level Murid Akademi. Semangat, masih bisa belajar!";
+      $("pangkat").textContent = p;
+    }
+
+    $("ulang").onclick = () => {
+      i = 0; skor = 0;
+      $("hasil").classList.add("hidden");
+      $("kuis").classList.remove("hidden");
+      tampil();
+    };
+
+    tampil();
+  </script>
+</body>
+</html>
